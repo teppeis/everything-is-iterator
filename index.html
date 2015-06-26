@@ -203,6 +203,11 @@ background-image: url(iterator.png)
 .footnote.right[Inspired by Dr. Axel]
 
 ---
+background-image: url(iterator-map-forof.png)
+
+# Map and for..of
+
+---
 # Map and for..of
 
 ```js
@@ -215,13 +220,12 @@ for (let [k, v] of map) {
 }
 // "key: k1, value: v1"
 // "key: k2, value: v2"
-
-for (let v of map.values()) {
-  console.log(`value: ${v}`);
-}
-// "value: v1"
-// "value: v2"
 ```
+
+---
+background-image: url(iterator-string-spread.png)
+
+# String and Spread Operator
 
 ---
 # String and Spread Operator
@@ -237,6 +241,11 @@ strlen("𠮷野家"); // 3
 ```
 
 ---
+background-image: url(iterator-nodelist-destructuring.png)
+
+# NodeList and Destructuring
+
+---
 # NodeList and Destructuring
 
 ```js
@@ -250,7 +259,7 @@ template: chart
 ---
 class: center, middle, inverse
 
-# Object is not iterable
+# Warning
 
 ---
 # Object is not iterable
@@ -260,17 +269,25 @@ JSのObjectはすべてのオブジェクトの基底クラスなので、デフ
 特定のオブジェクトをIterableにするのは自由。
 
 ---
+class: center, middle, inverse
+
+# Conclusion
+
+---
 # Before ES6 Iterator
 
-* for loop: ArrayLikeに頼るか自前実装
-* for..in loop: 曖昧なオブジェクトプロパティ、順不定
-* Array#forEach: Arrayを継承 or メソッドの実装が必要
+* for loop
+    * ArrayLike、インデックスに頼る or 自前走査
+* for..in loop
+    * オブジェクトプロパティの曖昧さ、順不定
+* Array#forEach
+    * Arrayを継承 or メソッドの実装が必要
 
 ---
 # After ES6 Iterator
 
-* Symbolを使うのでどんなオブジェクトにも組み込める
-* Iteratorの実装で元のオブジェクトが汚れない
+* `Symbol.iterator`を使うのでどんなオブジェクトをIterableにしてもコンフリクトしない
+* Iteratorの実装が分離されてるので元のオブジェクトが汚れない
 * IterableもConsumerも自由に実装して組み合わせられる
 
 ---
