@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Run through ES6</title>
+    <meta charset="utf-8">
+    <style>
+      @import url(https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz);
+      @import url(https://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700,400italic);
+
+      body {
+        font-family: sans-serif;
+      }
+      h1, h2, h3 {
+        font-family: 'Yanone Kaffeesatz';
+        font-weight: normal;
+      }
+      .inverse {
+        background: #272822;
+        color: #777872;
+        text-shadow: 0 0 20px #333;
+      }
+      .inverse h1, .inverse h2 {
+        color: #f3f3f3;
+        line-height: 0.8em;
+      }
+      .remark-code, .remark-inline-code {
+        font-family: 'Ubuntu Mono', monospace;
+      }
+      .remark-code {
+        font-size: 24px;
+      }
+      .remark-slide-content {
+        font-size: 24px;
+      }
+      .remark-slide-content h3 {
+        margin-bottom: -30px;
+      }
+      .title-page h1 {
+        font-size: 140px;
+      }
+      .footnote {
+        position: absolute;
+        bottom: 3em;
+        font-size: 20px;
+      }
+      .footnote.right {
+        right: 3em;
+      }
+      .avatar {
+        width: 32px;
+        vertical-align: top;
+      }
+    </style>
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-page
+
+# Everything is Iterator
+
+### 2015/06/27 #tng16
+### by @teppeis
+
+---
+# Hello!
+
+* Teppei Sato
+* <a href="https://twitter.com/teppeis">@teppeis</a> <img src="https://secure.gravatar.com/avatar/b593af919ac846342f62d33b32beef2a?s=32" class="avatar">
+* Cybozu, Inc. / kintone
+
+---
+class: wdpress
+background-image: url(wdpress87.jpg)
+
+???
+
+WEB+DB PRESS Vol.87でES6特集を書きました。
+
+---
+class: center, middle, inverse
+
+# ES6 Iterator
+
+---
+class: bottom right
+background-image: url(2arity.png)
+
+[http://www.2ality.com/2015/02/es6-iteration.html](http://www.2ality.com/2015/02/es6-iteration.html)
+
+???
+
+Dr. Axelから多くの知見をもらいました。
+より詳しく知りたい人は参照してください。
+
+---
+# Iterator Pattern
+
+&gt; “集約オブジェクトが基にある内部表現を公開せずに、その要素に順にアクセスする方法を提供する。” -- GoF
+
+* 集合と反復ロジックの分離
+* 反復処理用インターフェイスの統一
+* 複数の反復処理を同時に実行可能
+
+---
+# Two Core Interfaces
+
+```js
+interface Iterable {
+  [Symbol.iterator](): Iterator;
+}
+
+interface Iterator {
+  next(): {value: any, done: boolean};
+}
+```
+
+Symbolを使っているため、既存のオブジェクトを`Iterable`化しても絶対にプロパティが衝突しない。
+
+---
+# Array is an Iterable
+
+```js
+var nums = [1, 2, 3];
+
+var iter = nums[Symbol.iterator]();
+console.log(iter.next()); // {value: 1, done: false}
+console.log(iter.next()); // {value: 2, done: false}
+console.log(iter.next()); // {value: 3, done: false}
+console.log(iter.next()); // {value: undefined, done: true}
+```
+
+---
+# for..of consumes an Iterable
+
+```js
+var nums = [1, 2, 3];
+
+for (let n of nums) {
+  console.log(n);
+}
+// 1
+// 2
+// 3
+```
+
+---
+# String is an Iterable
+
+```js
+var str = "𠮷野家";
+
+var iter = str[Symbol.iterator]();
+// Surrogate Pair!
+console.log(iter.next()); // {value: "𠮷", done: false}
+console.log(iter.next()); // {value: "野", done: false}
+console.log(iter.next()); // {value: "家", done: false}
+console.log(iter.next()); // {value: undefined, done: true}
+```
+
+---
+# for..of consumes String
+
+```js
+var str = "𠮷野家";
+
+for (let s of str) {
+  console.log(s);
+}
+// "𠮷"
+// "野"
+// "家"
+```
+
+---
+# Many other Iterables
+
+* Array
+* String
+* Map
+* Set
+* `entries()`, `keys()` and `values()`
+* `arguments`
+* DOM NodeList
+* Generator
+
+---
+# Many other consumers
+
+* for..of
+* `Array.from()`
+* Spread Operator
+* Destructuring
+* Map and Set constructors
+* `Promise.all()`, `Promise.race()`
+* `yield*`
+
+---
+name: chart
+background-image: url(iterator.png)
+
+# Iterable as a Hub
+
+.footnote.right[Inspired by Dr. Axel]
+
+---
+# Map and for..of
+
+```js
+var map = new Map();
+map.set('k1', 'v1');
+map.set('k2', 'v2');
+
+for (let [k, v] of map) {
+  console.log(`key: ${k}, value: ${v}`);
+}
+// "key: k1, value: v1"
+// "key: k2, value: v2"
+
+for (let v of map.values()) {
+  console.log(`value: ${v}`);
+}
+// "value: v1"
+// "value: v2"
+```
+
+---
+# String and Spread Operator
+
+`strlen` function for surrogate pairs
+
+```js
+function strlen(str) {
+  return [...str].length;
+}
+
+strlen("𠮷野家"); // 3
+```
+
+---
+# NodeList and Destructuring
+
+```js
+var [first, second] =
+  document.querySelectorAll('.foo .bar');
+```
+
+---
+template: chart
+
+---
+class: center, middle, inverse
+
+# Object is not iterable
+
+---
+# Object is not iterable
+
+JSのObjectはすべてのオブジェクトの基底クラスなので、デフォルトでIterableにするといろいろ大変なことになる。
+
+特定のオブジェクトをIterableにするのは自由。
+
+---
+# Before ES6 Iterator
+
+* for loop: ArrayLikeに頼るか自前実装
+* for..in loop: 曖昧なオブジェクトプロパティ、順不定
+* Array#forEach: Arrayを継承 or メソッドの実装が必要
+
+---
+# After ES6 Iterator
+
+* Symbolを使うのでどんなオブジェクトにも組み込める
+* Iteratorの実装で元のオブジェクトが汚れない
+* IterableもConsumerも自由に実装して組み合わせられる
+
+---
+class: center, middle, inverse
+
+# Thanks!
+
+    </textarea>
+    <script src="https://gnab.github.io/remark/downloads/remark-latest.min.js">
+    </script>
+    <script>
+      var slideshow = remark.create();
+    </script>
+  </body>
+</html>
